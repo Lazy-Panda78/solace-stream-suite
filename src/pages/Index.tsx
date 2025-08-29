@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Navigation from "@/components/Navigation";
-import { MessageCircle, Calendar, BookOpen, Users, ClipboardCheck, Phone, Shield, Heart, Brain, Globe } from "lucide-react";
+import { MessageCircle, Calendar, BookOpen, Users, ClipboardCheck, Phone, Shield, Heart, Brain, Globe, LogIn } from "lucide-react";
 
 const Index = () => {
   const features = [
@@ -79,10 +79,10 @@ const Index = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Link to="/chat">
+            <Link to="/auth">
               <Button variant="calm" size="lg" className="w-full sm:w-auto">
-                <MessageCircle className="mr-2 h-5 w-5" />
-                Start AI Chat
+                <LogIn className="mr-2 h-5 w-5" />
+                Sign In to Get Started
               </Button>
             </Link>
             <Link to="/booking">

@@ -1,11 +1,33 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
-import { Heart, Menu, X, User } from "lucide-react";
-import { useState } from "react";
+import { Heart, Menu, X, User, LogIn } from "lucide-react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { User as SupabaseUser, Session } from "@supabase/supabase-js";
 
 export default function Navigation() {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+
+  useEffect(() => {
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+      }
+    );
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const navItems = [
     { path: "/", label: "Home" },
@@ -42,11 +64,28 @@ export default function Navigation() {
               </Link>
             ))}
             <Link to="/admin">
-              <Button variant="calm" size="sm">
+              <Button variant="ghost" size="sm" className={isActive("/admin") ? "text-primary" : ""}>
                 <User className="h-4 w-4 mr-1" />
                 Admin
               </Button>
             </Link>
+            
+            {/* Auth Button */}
+            {user ? (
+              <Link to="/profile">
+                <Button variant="calm" size="sm">
+                  <User className="h-4 w-4 mr-1" />
+                  Profile
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/auth">
+                <Button variant="calm" size="sm">
+                  <LogIn className="h-4 w-4 mr-1" />
+                  Sign In
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -78,11 +117,28 @@ export default function Navigation() {
               </Link>
             ))}
             <Link to="/admin" onClick={() => setMobileMenuOpen(false)}>
-              <Button variant="calm" size="sm" className="w-full mt-2">
+              <Button variant="ghost" size="sm" className="w-full justify-start">
                 <User className="h-4 w-4 mr-1" />
                 Admin Dashboard
               </Button>
             </Link>
+            
+            {/* Mobile Auth Button */}
+            {user ? (
+              <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="calm" size="sm" className="w-full mt-2">
+                  <User className="h-4 w-4 mr-1" />
+                  Profile
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="calm" size="sm" className="w-full mt-2">
+                  <LogIn className="h-4 w-4 mr-1" />
+                  Sign In
+                </Button>
+              </Link>
+            )}
           </div>
         )}
       </div>
